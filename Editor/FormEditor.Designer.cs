@@ -83,9 +83,14 @@
             splitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             splitContainer.Location = new System.Drawing.Point(0, 24);
             splitContainer.Name = "splitContainer";
+            // 
+            // splitContainer.Panel1
+            // 
+            splitContainer.Panel1.SizeChanged += splitContainer_Panel1_SizeChanged;
             splitContainer.Size = new System.Drawing.Size(800, 404);
             splitContainer.SplitterDistance = 555;
             splitContainer.TabIndex = 2;
+            splitContainer.SizeChanged += splitContainer_SizeChanged;
             // 
             // FormEditor
             // 

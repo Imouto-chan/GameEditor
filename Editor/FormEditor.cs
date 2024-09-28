@@ -12,7 +12,7 @@ namespace Editor
 {
     public partial class FormEditor : Form
     {
-        public GameEditor Game {  get; set; }
+        public GameEditor Game { get; set; }
 
         public FormEditor()
         {
@@ -27,6 +27,18 @@ namespace Editor
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Game.Exit();
+        }
+
+        private void splitContainer_SizeChanged(object sender, EventArgs e)
+        {
+            if (Game == null) return;
+            Game.AdjustAspectRatio();
+        }
+
+        private void splitContainer_Panel1_SizeChanged(object sender, EventArgs e)
+        {
+            if (Game == null) return;
+            Game.AdjustAspectRatio();
         }
     }
 }
