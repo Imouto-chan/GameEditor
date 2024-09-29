@@ -1,15 +1,17 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Editor.Engine;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Windows.Forms;
 
-namespace Editor
+namespace Editor.Editor
 {
     public class GameEditor : Game
     {
+        internal Project Project { get; set; }
+
         private GraphicsDeviceManager m_graphics;
         private FormEditor m_parent;
-        private Level m_level;
 
         public GameEditor()
         {
@@ -39,9 +41,6 @@ namespace Editor
 
         protected override void LoadContent()
         {
-            m_level = new();
-            m_level.LoadContent(Content);
-            AdjustAspectRatio();
         }
 
         protected override void Update(GameTime gameTime)
@@ -53,14 +52,15 @@ namespace Editor
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            m_level.Render();
+            if (Project != null) Project.Render();
 
             base.Draw(gameTime);
         }
 
         public void AdjustAspectRatio()
         {
-            Camera c = m_level.GetCamera();
+            if (Project == null) return;
+            Camera c = Project.CurrentLevel.GetCamera();
             c.Update(c.Position, m_graphics.GraphicsDevice.Viewport.AspectRatio);
         }
     }

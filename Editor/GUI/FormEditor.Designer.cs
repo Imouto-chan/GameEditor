@@ -30,6 +30,11 @@
         {
             menuStrip1 = new System.Windows.Forms.MenuStrip();
             fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            projectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            createToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             statusStrip1 = new System.Windows.Forms.StatusStrip();
             toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
@@ -51,15 +56,48 @@
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { exitToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { projectToolStripMenuItem, toolStripSeparator1, exitToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             fileToolStripMenuItem.Text = "File";
             // 
+            // projectToolStripMenuItem
+            // 
+            projectToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { createToolStripMenuItem, saveToolStripMenuItem, loadToolStripMenuItem });
+            projectToolStripMenuItem.Name = "projectToolStripMenuItem";
+            projectToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            projectToolStripMenuItem.Text = "Project";
+            // 
+            // createToolStripMenuItem
+            // 
+            createToolStripMenuItem.Name = "createToolStripMenuItem";
+            createToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            createToolStripMenuItem.Text = "Create";
+            createToolStripMenuItem.Click += createToolStripMenuItem_Click;
+            // 
+            // saveToolStripMenuItem
+            // 
+            saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            saveToolStripMenuItem.Text = "Save";
+            saveToolStripMenuItem.Click += saveToolStripMenuItem_Click;
+            // 
+            // loadToolStripMenuItem
+            // 
+            loadToolStripMenuItem.Name = "loadToolStripMenuItem";
+            loadToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            loadToolStripMenuItem.Text = "Load";
+            loadToolStripMenuItem.Click += loadToolStripMenuItem_Click;
+            // 
+            // toolStripSeparator1
+            // 
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            // 
             // exitToolStripMenuItem
             // 
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new System.Drawing.Size(93, 22);
+            exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
             // 
@@ -121,5 +159,10 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         public System.Windows.Forms.SplitContainer splitContainer;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem projectToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem createToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loadToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
     }
 }
