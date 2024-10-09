@@ -9,16 +9,29 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Editor.Editor;
 using System.IO;
+using Editor.Engine;
 
 namespace Editor
 {
     public partial class FormEditor : Form
     {
-        public GameEditor Game { get; set; }
+        public GameEditor Game { get => m_game; set { m_game = value; HookEvents(); } }
+
+        private GameEditor m_game = null;
 
         public FormEditor()
         {
             InitializeComponent();
+            KeyPreview = true;
+        }
+
+        private void HookEvents()
+        {
+            Form gameForm = Control.FromHandle(m_game.Window.Handle) as Form;
+            gameForm.MouseDown += FormEditor_MouseDown;
+            gameForm.MouseUp += FormEditor_MouseUp;
+            KeyDown += FormEditor_KeyDown;
+            KeyUp += FormEditor_KeyUp;
         }
 
         private void toolStripStatusLabel1_Click(object sender, EventArgs e)
@@ -76,6 +89,26 @@ namespace Editor
                 Text = "Our Cool Editor - " + Game.Project.Name;
                 Game.AdjustAspectRatio();
             }
+        }
+
+        private void FormEditor_MouseUp(object sender, MouseEventArgs e)
+        {
+            InputController.Instance.SetBuuttonUp(e.Button);
+        }
+
+        private void FormEditor_MouseDown(object sender, MouseEventArgs e)
+        {
+            InputController.Instance.SetButtonDown(e.Button);
+        }
+
+        private void FormEditor_KeyUp(object sender, KeyEventArgs e)
+        {
+            InputController.Instance.SetKeyUp(e.KeyCode);
+        }
+
+        private void FormEditor_KeyDown(object sender, KeyEventArgs e)
+        {
+            InputController.Instance.SetKeyDown(e.KeyCode);
         }
     }
 }
