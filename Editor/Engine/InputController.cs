@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Xna.Framework;
 
 namespace Editor.Engine
 {
@@ -12,8 +13,14 @@ namespace Editor.Engine
         private static readonly Lazy<InputController> lazy = new(() => new InputController());
         public static InputController Instance { get { return lazy.Value; } }
 
+        public Vector2 MousePosition { get; set; } = Vector2.Zero;
+        public Vector2 LastPosition { get; private set; } = Vector2.Zero;
+        public Vector2 DragStart { get; set; } = Vector2.Zero;
+        public Vector2 DragEnd { get; set; } = Vector2.Zero;
+
         private Dictionary<Keys, bool> m_keyState = new();
         private Dictionary<MouseButtons, bool> m_buttonState = new();
+        private int m_mouseWheel = 0;
 
         private InputController()
         {
@@ -58,6 +65,22 @@ namespace Editor.Engine
         public bool IsButtonDown(MouseButtons _button)
         {
             return m_buttonState[_button];
+        }
+
+        public void SetWheel(int _delta)
+        {
+            m_mouseWheel += _delta;
+        }
+
+        public int GetWheel()
+        {
+            return m_mouseWheel;
+        }
+
+        public void Clear()
+        {
+            m_mouseWheel = 0;
+            LastPosition = MousePosition;
         }
 
         public override string ToString()

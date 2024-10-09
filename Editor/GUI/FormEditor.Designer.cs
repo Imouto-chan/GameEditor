@@ -144,6 +144,7 @@
             KeyDown += FormEditor_KeyDown;
             KeyUp += FormEditor_KeyUp;
             MouseDown += FormEditor_MouseDown;
+            MouseMove += FormEditor_MouseMove;
             MouseUp += FormEditor_MouseUp;
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();

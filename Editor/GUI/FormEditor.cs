@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using Editor.Editor;
 using System.IO;
 using Editor.Engine;
+using Microsoft.Xna.Framework;
 
 namespace Editor
 {
@@ -30,6 +31,8 @@ namespace Editor
             Form gameForm = Control.FromHandle(m_game.Window.Handle) as Form;
             gameForm.MouseDown += FormEditor_MouseDown;
             gameForm.MouseUp += FormEditor_MouseUp;
+            gameForm.MouseWheel += FormEditor_MouseWheel;
+            gameForm.MouseMove += FormEditor_MouseMove;
             KeyDown += FormEditor_KeyDown;
             KeyUp += FormEditor_KeyUp;
         }
@@ -94,21 +97,38 @@ namespace Editor
         private void FormEditor_MouseUp(object sender, MouseEventArgs e)
         {
             InputController.Instance.SetBuuttonUp(e.Button);
+            var p = new Vector2(e.Location.X, e.Location.Y);
+            InputController.Instance.DragEnd = p;
         }
 
         private void FormEditor_MouseDown(object sender, MouseEventArgs e)
         {
             InputController.Instance.SetButtonDown(e.Button);
+            var p = new Vector2(e.Location.X, e.Location.Y);
+            InputController.Instance.DragStart = p;
         }
 
         private void FormEditor_KeyUp(object sender, KeyEventArgs e)
         {
             InputController.Instance.SetKeyUp(e.KeyCode);
+            e.Handled = true;
         }
 
         private void FormEditor_KeyDown(object sender, KeyEventArgs e)
         {
             InputController.Instance.SetKeyDown(e.KeyCode);
+            e.Handled = true;
+        }
+
+        private void FormEditor_MouseMove(object sender, MouseEventArgs e)
+        {
+            var p = new Vector2(e.Location.X, e.Location.Y);
+            InputController.Instance.MousePosition = p;
+        }
+
+        private void FormEditor_MouseWheel(object sender, MouseEventArgs e)
+        {
+            InputController.Instance.SetWheel(e.Delta / SystemInformation.MouseWheelScrollDelta);
         }
     }
 }
