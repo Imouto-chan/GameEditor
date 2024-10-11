@@ -44,7 +44,7 @@ namespace Editor.Engine
             }
         }
 
-        public void Update(float _delta)
+        public void HandleTranslate()
         {
             InputController ic = InputController.Instance;
             Vector3 translate = Vector3.Zero;
@@ -76,7 +76,11 @@ namespace Editor.Engine
             {
                 m_camera.Translate(translate * 0.001f);
             }
+        }
 
+        private void HandleRotate(float _delta)
+        {
+            InputController ic = InputController.Instance;
             if (ic.IsButtonDown(MouseButtons.Right))
             {
                 Vector2 dir = ic.MousePosition - ic.LastPosition;
@@ -86,6 +90,36 @@ namespace Editor.Engine
                     m_camera.Rotate(movement);
                 }
             }
+        }
+
+        private void HandlePick()
+        {
+            InputController ic = InputController.Instance;
+            if (ic.IsButtonDown(MouseButtons.Left))
+            {
+                Ray r = ic.GetPickRay(m_camera);
+                foreach (Models model in m_models)
+                {
+                    model.Selected = false;
+                    foreach (ModelMesh mesh in model.Mesh.Meshes)
+                    {
+                        BoundingSphere s = mesh.BoundingSphere;
+                        s = s.Transform(model.GetTransform());
+                        float? f = r.Intersects(s);
+                        if (f.HasValue)
+                        {
+                            model.Selected = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        public void Update(float _delta)
+        {
+            HandleTranslate();
+            HandleRotate(_delta);
+            HandlePick();
         }
 
         public override string ToString()

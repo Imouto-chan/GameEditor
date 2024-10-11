@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Editor.Engine;
 using Editor.Engine.Interfaces;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 
 namespace Editor.Engine
@@ -20,6 +21,7 @@ namespace Editor.Engine
         public float NearPlane { get; set; } = 0.1f;
         public float FarPlane { get; set; } = 1000f;
         public float AspectRatio { get; set; } = 16 / 9;
+        public Viewport Viewport { get; set; }
 
         public Camera() 
         {
