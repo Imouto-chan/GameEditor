@@ -39,9 +39,11 @@
             statusStrip1 = new System.Windows.Forms.StatusStrip();
             toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             splitContainer = new System.Windows.Forms.SplitContainer();
+            propertyGrid = new System.Windows.Forms.PropertyGrid();
             menuStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer).BeginInit();
+            splitContainer.Panel2.SuspendLayout();
             splitContainer.SuspendLayout();
             SuspendLayout();
             // 
@@ -125,10 +127,22 @@
             // splitContainer.Panel1
             // 
             splitContainer.Panel1.SizeChanged += splitContainer_Panel1_SizeChanged;
+            // 
+            // splitContainer.Panel2
+            // 
+            splitContainer.Panel2.Controls.Add(propertyGrid);
             splitContainer.Size = new System.Drawing.Size(800, 404);
             splitContainer.SplitterDistance = 555;
             splitContainer.TabIndex = 2;
             splitContainer.SizeChanged += splitContainer_SizeChanged;
+            // 
+            // propertyGrid
+            // 
+            propertyGrid.Dock = System.Windows.Forms.DockStyle.Fill;
+            propertyGrid.Location = new System.Drawing.Point(0, 0);
+            propertyGrid.Name = "propertyGrid";
+            propertyGrid.Size = new System.Drawing.Size(241, 404);
+            propertyGrid.TabIndex = 0;
             // 
             // FormEditor
             // 
@@ -150,6 +164,7 @@
             menuStrip1.PerformLayout();
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
+            splitContainer.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)splitContainer).EndInit();
             splitContainer.ResumeLayout(false);
             ResumeLayout(false);
@@ -169,5 +184,6 @@
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem loadToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        public System.Windows.Forms.PropertyGrid propertyGrid;
     }
 }
