@@ -11,7 +11,7 @@ using System.IO;
 
 namespace Editor.Engine
 {
-    internal class Models : ISerializable
+    internal class Models : ISerializable, ISelectable
     {
         public Model Mesh { get; set; }
         public Effect Shader { get; set; }

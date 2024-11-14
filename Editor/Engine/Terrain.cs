@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Editor.Engine.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Editor.Engine
 {
-    internal class Terrain
+    internal class Terrain : ISelectable
     {
         public VertexPositionNormalTexture[] Vertices { get; set; } // Vertex array
         public VertexBuffer VertexBuffer { get; set; } // Vertex Buffer
@@ -24,6 +25,7 @@ namespace Editor.Engine
         public Vector3 LightDirection { get; set; } // Direction light is emanating from
         public Texture2D HeightMap { get; set; } // Heightmap texture
         public Texture2D BaseTexture { get; set; } // The terrain diffuse texture
+        public bool Selected { get; set; } = false;
 
         public Terrain(Texture2D _heightMap, Texture2D _baseTexture, int _height, GraphicsDevice _device)
         {
@@ -149,6 +151,7 @@ namespace Editor.Engine
             _effect.Parameters["BaseTexture"].SetValue(BaseTexture);
             _effect.Parameters["TextureTiling"].SetValue(15.0f);
             _effect.Parameters["LightDirection"].SetValue(LightDirection);
+            _effect.Parameters["Tint"].SetValue(Selected);
 
             Device.SetVertexBuffer(VertexBuffer);
             Device.Indices = IndexBuffer;
