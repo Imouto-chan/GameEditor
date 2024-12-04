@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using Editor.Engine.Interfaces;
 using System.IO;
 using System.Windows.Forms;
+using Editor.Editor;
+using Editor.Engine.Lights;
 
 namespace Editor.Engine
 {
@@ -17,23 +19,40 @@ namespace Editor.Engine
         public Camera GetCamera() { return m_camera; }
 
         private List<Models> m_models = new();
-        private Camera m_camera = new(new Vector3(0, 2, 2), 16 / 9);
+        private Camera m_camera = new(new Vector3(0, 400, 500), 16 / 9);
         private Effect m_terrainEffect = null;
         private Terrain m_terrain = null;
+        private Light m_light = new()
+        {
+            Position = new(0, 400, -500),
+            Color = new(0.9f, 0.9f, 0.9f)
+        };
 
         public Level()
         {
         }
 
-        public void LoadContent(GraphicsDevice _device, ContentManager _content)
+        public void LoadContent(GameEditor _game)
         {
-            m_terrainEffect = _content.Load<Effect>("TerrainEffect");
-            m_terrain = new(_content.Load<Texture2D>("HeightMap"), _content.Load<Texture2D>("Grass"), 200, _device);
+        //    m_terrain = new(_game.DefaultEffect, _game.DefaultHeightMap,
+        //                    _game.DefaultGrass, 200, _game.GraphicsDevice);
         }
 
         public void AddModel(Models _model)
         {
             m_models.Add(_model);
+        }
+
+        public void ClearSelectedModels()
+        {
+            foreach (var model in m_models)
+            {
+                model.Selected = false;
+            }
+            if (m_terrain != null)
+            {
+                m_terrain.Selected = false;
+            }
         }
 
         public List<ISelectable> GetSelectedModels()
@@ -43,19 +62,27 @@ namespace Editor.Engine
             {
                 if (model.Selected) models.Add(model);
             }
-            if (m_terrain.Selected) models.Add(m_terrain);
+            if (m_terrain != null)
+            {
+                if (m_terrain.Selected) models.Add(m_terrain);
+            }
 
             return models;
         }
 
         public void Render()
         {
+            Renderer r = Renderer.Instance;
+            r.Camera = m_camera;
+            r.Light = m_light;
             foreach (Models m in m_models)
             {
-                m.Render(m_camera.View, m_camera.Projection);
+                r.Render(m);
             }
-
-            m_terrain.Draw(m_terrainEffect, m_camera.View, m_camera.Projection);
+            if (m_terrain != null)
+            {
+                r.Render(m_terrain);
+            }
         }
 
         public void HandleTranslate()
@@ -123,7 +150,7 @@ namespace Editor.Engine
                             model.Rotation += movement;
                         }
                     }
-                    
+
                     if (!modelRotated)
                     {
                         m_camera.Rotate(movement);
@@ -132,17 +159,17 @@ namespace Editor.Engine
             }
         }
 
-        private void HandlePick()
+        internal ISelectable HandlePick(bool _select = true)
         {
             float? f;
             Matrix transform = Matrix.Identity;
             InputController ic = InputController.Instance;
-            if (ic.IsButtonDown(MouseButtons.Left))
+            if ((ic.IsButtonDown(MouseButtons.Left)) || (!_select))
             {
                 Ray r = HelpMath.GetPickRay(ic.MousePosition, m_camera);
                 foreach (Models model in m_models)
                 {
-                    model.Selected = false;
+                    if (_select) model.Selected = false;
                     transform = model.GetTransform();
                     foreach (ModelMesh mesh in model.Mesh.Meshes)
                     {
@@ -154,6 +181,7 @@ namespace Editor.Engine
                             f = HelpMath.PickTriangle(in mesh, ref r, ref transform);
                             if (f.HasValue)
                             {
+                                if (!_select) return model;
                                 model.Selected = true;
                             }
                         }
@@ -161,14 +189,20 @@ namespace Editor.Engine
                 }
 
                 // Check terrain
-                transform = Matrix.Identity;
-                f = HelpMath.PickTriangle(in m_terrain, ref r, ref transform);
-                m_terrain.Selected = false;
-                if (f.HasValue)
+                if (m_terrain != null)
                 {
-                    m_terrain.Selected = true;
+                    transform = Matrix.Identity;
+                    f = HelpMath.PickTriangle(in m_terrain, ref r, ref transform);
+                    m_terrain.Selected = false;
+                    if (f.HasValue)
+                    {
+                        if (!_select) return m_terrain;
+                        m_terrain.Selected = true;
+                    }
                 }
             }
+
+            return null;
         }
 
         private void HandleScale(float _delta)
@@ -224,16 +258,16 @@ namespace Editor.Engine
             m_camera.Serialize(_stream);
         }
 
-        public void Deserialize(BinaryReader _stream, ContentManager _content)
+        public void Deserialize(BinaryReader _stream, GameEditor _game)
         {
             int modelCount = _stream.ReadInt32();
             for (int count = 0; count < modelCount; count++)
             {
                 Models m = new();
-                m.Deserialize(_stream, _content);
+                m.Deserialize(_stream, _game);
                 m_models.Add(m);
             }
-            m_camera.Deserialize(_stream, _content);
+            m_camera.Deserialize(_stream, _game);
         }
     }
 }

@@ -8,65 +8,106 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Editor.Engine.Interfaces;
 using System.IO;
+using Editor.Editor;
 
 namespace Editor.Engine
 {
-    internal class Models : ISerializable, ISelectable
+    internal class Models : ISerializable, ISelectable, IRenderable
     {
         public Model Mesh { get; set; }
-        public Effect Shader { get; set; }
+        public Material Material { get; private set; }
         public Vector3 Position { get => m_position; set { m_position = value; } }
         public Vector3 Rotation { get => m_rotation; set { m_rotation = value; } }
         public float Scale { get; set; }
-        public bool Selected { get; set; } = false;
+        public bool Selected
+        {
+            get { return m_selected; }
+            set
+            {
+                if (m_selected != value)
+                {
+                    m_selected = value;
+                    SelectedDirty = true;
+                }
+            }
+        }
+        public string Name { get; set; }
+        public static bool SelectedDirty { get; set; } = false;
 
         public Texture Texture { get; set; }
 
         private Vector3 m_position;
         private Vector3 m_rotation;
+        private bool m_selected;
 
         public Models()
         {
         }
 
-        public Models(ContentManager _content,
+        public Models(GameEditor _game,
             string _model,
             string _texture,
             string _effect,
             Vector3 _position,
             float _scale)
         {
-            Create(_content, _model, _texture, _effect, _position, _scale);
+            Create(_game, _model, _texture, _effect, _position, _scale);
         }
 
-        public void Create(ContentManager _content,
+        public void Create(GameEditor _game,
             string _model,
             string _texture,
             string _effect,
             Vector3 _position,
             float _scale)
         {
-            Mesh = _content.Load<Model>(_model);
+            Mesh = _game.Content.Load<Model>(_model);
             Mesh.Tag = _model;
-            Texture = _content.Load<Texture>(_texture);
-            Texture.Tag = _texture;
-            Shader = _content.Load<Effect>(_effect);
-            Shader.Tag = _effect;
-            SetShader(Shader);
+            Name = _model;
+            Material = new Material();
+            SetTexture(_game, _texture);
+            SetShader(_game, _effect);
             m_position = _position;
             Scale = _scale;
         }
 
         public void SetShader(Effect _effect)
         {
-            Shader = _effect;
+            Material.Effect = _effect;
             foreach (ModelMesh mesh in Mesh.Meshes)
             {
                 foreach (ModelMeshPart meshPart in mesh.MeshParts)
                 {
-                    meshPart.Effect = Shader;
+                    meshPart.Effect = Material.Effect;
                 }
             }
+        }
+
+        public void SetTexture(GameEditor _game, string _texture)
+        {
+            if (_texture == "DefaultTexture")
+            {
+                Material.Diffuse = _game.DefaultTexture;
+            }
+            else
+            {
+                Material.Diffuse = _game.Content.Load<Texture>(_texture);
+            }
+            Material.Diffuse.Tag = _texture;
+        }
+
+        public void SetShader(GameEditor _game, string _effect)
+        {
+            if (_effect == "DefaultEffect")
+            {
+                Material.Effect = _game.DefaultEffect;
+            }
+            else
+            {
+                Material.Effect = _game.Content.Load<Effect>(_effect);
+            }
+            Material.Effect.Tag = _effect;
+            SetShader(Material.Effect);
         }
 
         public void Translate(Vector3 _translate, Camera _camera)
@@ -95,16 +136,8 @@ namespace Editor.Engine
                 Matrix.CreateTranslation(Position);
         }
 
-        public void Render(Matrix _view, Matrix _projection)
+        public void Render()
         {
-            m_position.X += 0.001f;
-            m_rotation.Y += 0.005f;
-
-            Shader.Parameters["World"].SetValue(GetTransform());
-            Shader.Parameters["WorldViewProjection"].SetValue(GetTransform() * _view * _projection);
-            Shader.Parameters["Texture"].SetValue(Texture);
-            Shader.Parameters["Tint"].SetValue(Selected);
-
             foreach (ModelMesh mesh in Mesh.Meshes)
             {
                 mesh.Draw();
@@ -114,14 +147,14 @@ namespace Editor.Engine
         public void Serialize(BinaryWriter _stream)
         {
             _stream.Write(Mesh.Tag.ToString());
-            _stream.Write(Texture.Tag.ToString());
-            _stream.Write(Shader.Tag.ToString());
+            _stream.Write(Material.Diffuse.Tag.ToString());
+            _stream.Write(Material.Effect.Tag.ToString());
             HelpSerialize.Vec3(_stream, Position);
             HelpSerialize.Vec3(_stream, Rotation);
             _stream.Write(Scale);
         }
 
-        public void Deserialize(BinaryReader _stream, ContentManager _content)
+        public void Deserialize(BinaryReader _stream, GameEditor _game)
         {
             string mesh = _stream.ReadString();
             string texture = _stream.ReadString();
@@ -129,7 +162,8 @@ namespace Editor.Engine
             Position = HelpDeserialize.Vec3(_stream);
             Rotation = HelpDeserialize.Vec3(_stream);
             Scale = _stream.ReadSingle();
-            Create(_content, mesh, texture, shader, Position, Scale);
+            Material = new Material();
+            Create(_game, mesh, texture, shader, Position, Scale);
         }
     }
 }

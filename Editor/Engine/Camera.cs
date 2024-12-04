@@ -9,6 +9,7 @@ using Editor.Engine.Interfaces;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
+using Editor.Editor;
 
 namespace Editor.Engine
 {
@@ -87,7 +88,7 @@ namespace Editor.Engine
             _stream.Write(AspectRatio);
         }
 
-        public void Deserialize(BinaryReader _stream, ContentManager _content)
+        public void Deserialize(BinaryReader _stream, GameEditor _game)
         {
             Position = HelpDeserialize.Vec3(_stream);
             NearPlane = _stream.ReadSingle();

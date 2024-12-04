@@ -27,7 +27,7 @@ namespace Editor.Editor
         { 
         }
 
-        public Project(GraphicsDevice _device, ContentManager _content, string _name)
+        public Project(GameEditor _game, string _name)
         {
             Folder = Path.GetDirectoryName(_name);
             Name = Path.GetFileName(_name);
@@ -52,7 +52,7 @@ namespace Editor.Editor
             AssetMonitor.OnAssetsUpdated += AssetMon_OnAssetsUpdated;
 
             // Add a default level
-            AddLevel(_device, _content);
+            AddLevel(_game);
         }
 
         private void AssetMon_OnAssetsUpdated()
@@ -60,10 +60,10 @@ namespace Editor.Editor
             OnAssetsUpdated?.Invoke();
         }
 
-        public void AddLevel(GraphicsDevice _device, ContentManager _content) 
+        public void AddLevel(GameEditor _game) 
         {
             CurrentLevel = new();
-            CurrentLevel.LoadContent(_device, _content);
+            CurrentLevel.LoadContent(_game);
             Levels.Add(CurrentLevel);
         }
 
@@ -90,13 +90,13 @@ namespace Editor.Editor
             _stream.Write(Name);
         }
 
-        public void Deserialize(BinaryReader _stream, ContentManager _content)
+        public void Deserialize(BinaryReader _stream, GameEditor _game)
         {
             int levelCount = _stream.ReadInt32();
             for (int count = 0; count < levelCount; count++)
             {
                 Level l = new();
-                l.Deserialize(_stream, _content);
+                l.Deserialize(_stream, _game);
                 Levels.Add(l);
             }
             int clIndex = _stream.ReadInt32();

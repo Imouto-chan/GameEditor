@@ -9,6 +9,10 @@ namespace Editor.Editor
     public class GameEditor : Game
     {
         internal Project Project { get; set; }
+        internal Texture DefaultTexture { get; set; }
+        internal Effect DefaultEffect { get; set; }
+        internal Texture2D DefaultGrass { get; set; }
+        internal Texture2D DefaultHeightMap { get; set; }
 
         private GraphicsDeviceManager m_graphics;
         private FormEditor m_parent;
@@ -35,7 +39,7 @@ namespace Editor.Editor
             gameForm.TopLevel = false;
             gameForm.Dock = DockStyle.Fill;
             gameForm.FormBorderStyle = FormBorderStyle.None;
-            m_parent.splitContainer.Panel1.Controls.Add(gameForm);
+            m_parent.splitContainer2.Panel2.Controls.Add(gameForm);
         }
 
         protected override void Initialize()
@@ -48,19 +52,21 @@ namespace Editor.Editor
             m_spriteBatch = new(GraphicsDevice);
             m_fonts = new();
             m_fonts.LoadContent(Content);
+            DefaultTexture = Content.Load<Texture>("DefaultTexture");
+            DefaultGrass = Content.Load<Texture2D>("DefaultGrass");
+            DefaultHeightMap = Content.Load<Texture2D>("DefaultHeightMap");
+            DefaultEffect = Content.Load<Effect>("DefaultShader");
         }
 
-        protected override void Update(GameTime gameTime)
+        private void UpdateSelected()
         {
-            if (Project != null)
+            if (Models.SelectedDirty)
             {
-                Content.RootDirectory = Project.ContentFolder + "\\bin";
-                Project.Update((float)(gameTime.ElapsedGameTime.TotalMilliseconds / 1000));
-                InputController.Instance.Clear();
                 var models = Project.CurrentLevel.GetSelectedModels();
                 if (models.Count == 0)
                 {
                     m_parent.propertyGrid.SelectedObject = null;
+                    m_parent.listBoxLevel.SelectedIndex = -1;
                 }
                 else if (models.Count > 1)
                 {
@@ -69,7 +75,27 @@ namespace Editor.Editor
                 else
                 {
                     m_parent.propertyGrid.SelectedObject = models[0];
+                    for (int count = 0; count < m_parent.listBoxLevel.Items.Count; count++)
+                    {
+                        ListItemLevel lil = m_parent.listBoxLevel.Items[count] as ListItemLevel;
+                        if (lil.Model == models[0])
+                        {
+                            m_parent.listBoxLevel.SetSelected(count, true);
+                        }
+                    }
                 }
+            }
+            Models.SelectedDirty = false;
+        }
+
+        protected override void Update(GameTime gameTime)
+        {
+            if (Project != null)
+            {
+                Content.RootDirectory = Project.ContentFolder + "\\bin" + "\\Windows";
+                Project.Update((float)(gameTime.ElapsedGameTime.TotalMilliseconds / 1000));
+                InputController.Instance.Clear();
+                UpdateSelected();
             }
             base.Update(gameTime);
         }
