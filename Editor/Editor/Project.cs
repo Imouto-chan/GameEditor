@@ -38,7 +38,7 @@ namespace Editor.Editor
 
             // Create Content folder for assets, and copy the mgcb template
             ContentFolder = Path.Combine(Folder, "Content");
-            AssetFolder = Path.Combine(ContentFolder, "bin");
+            AssetFolder = Path.Combine(ContentFolder, "bin", "Windows");
             ObjectFolder = Path.Combine(ContentFolder, "obj");
             char d = Path.DirectorySeparatorChar;
             if (!Directory.Exists(ContentFolder))
@@ -49,13 +49,13 @@ namespace Editor.Editor
                 File.Copy($"ContentTemplate.mgcb", ContentFolder + $"{d}Content.mgcb");
             }
             AssetMonitor = new(ObjectFolder);
-            AssetMonitor.OnAssetsUpdated += AssetMon_OnAssetsUpdated;
+            AssetMonitor.OnAssetsUpdated += AssetMonitor_OnAssetsUpdated;
 
             // Add a default level
             AddLevel(_game);
         }
 
-        private void AssetMon_OnAssetsUpdated()
+        private void AssetMonitor_OnAssetsUpdated()
         {
             OnAssetsUpdated?.Invoke();
         }
@@ -79,6 +79,11 @@ namespace Editor.Editor
 
         public void Serialize(BinaryWriter _stream)
         {
+            _stream.Write(Folder);
+            _stream.Write(Name);
+            _stream.Write(ContentFolder);
+            _stream.Write(AssetFolder);
+            _stream.Write(ObjectFolder);
             _stream.Write(Levels.Count);
             int clIndex = Levels.IndexOf(CurrentLevel);
             foreach (var level in Levels)
@@ -86,12 +91,15 @@ namespace Editor.Editor
                 level.Serialize(_stream);
             }
             _stream.Write(clIndex);
-            _stream.Write(Folder);
-            _stream.Write(Name);
         }
 
         public void Deserialize(BinaryReader _stream, GameEditor _game)
         {
+            Folder = _stream.ReadString();
+            Name = _stream.ReadString();
+            ContentFolder = _stream.ReadString();
+            AssetFolder = _stream.ReadString();
+            ObjectFolder = _stream.ReadString();
             int levelCount = _stream.ReadInt32();
             for (int count = 0; count < levelCount; count++)
             {
@@ -101,8 +109,8 @@ namespace Editor.Editor
             }
             int clIndex = _stream.ReadInt32();
             CurrentLevel = Levels[clIndex];
-            Folder = _stream.ReadString();
-            Name = _stream.ReadString();
+            AssetMonitor = new(ObjectFolder);
+            AssetMonitor.OnAssetsUpdated += AssetMonitor_OnAssetsUpdated;
         }
     }
 }

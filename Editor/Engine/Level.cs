@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -226,12 +227,29 @@ namespace Editor.Engine
             }
         }
 
+        private void HandleAudio()
+        {
+            foreach (Models m in m_models)
+            {
+                if ((Models.SelectedDirty) &&
+                    m.Selected)
+                {
+                    var sfi = m.SoundEffects[(int)SoundEffectTypes.OnSelect];
+                    if (sfi?.Instance.State == SoundState.Stopped)
+                    {
+                        sfi.Instance.Play();
+                    }
+                }
+            }
+        }
+
         public void Update(float _delta)
         {
             HandleTranslate();
             HandleRotate(_delta);
             HandleScale(_delta);
             HandlePick();
+            HandleAudio();
         }
 
         public override string ToString()
@@ -246,6 +264,11 @@ namespace Editor.Engine
                 }
             }
             return m_camera.ToString() + s;
+        }
+
+        public List<Models> GetModelsList()
+        {
+            return m_models;
         }
 
         public void Serialize(BinaryWriter _stream)
